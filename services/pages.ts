@@ -1,6 +1,6 @@
 import db from "@/config/firestore"
 import { LOCALES } from '@/constants';
-import { Query, Timestamp, collection, getDocs, query, where } from "firebase/firestore"
+import { Query, Timestamp, addDoc, collection, getDocs, query, where } from "firebase/firestore"
 
 export interface PageDocumentData {
     createdAt?: Timestamp;
@@ -10,7 +10,7 @@ export interface PageDocumentData {
     slug: string;
     publishedAt?: Timestamp;
     locale: string;
-    id: string;
+    id?: string;
     parent?: PageParamsProps['slug']
     image?: HTMLImageElement
 }
@@ -55,5 +55,16 @@ export const getPageBySlug = async (slug?: string): Promise<DataResponseProps> =
         };
     } catch (e) {
         throw (e);
+    }
+};
+
+export const addPage = async (pageData: PageDocumentData): Promise<string> => {
+    try {
+        const docRef = await addDoc(collection(db, 'pages'), pageData);
+        return docRef.id;
+    } catch (error) {
+        console.log(error);
+
+        throw error;
     }
 };

@@ -1,48 +1,47 @@
 import db from "@/config/firestore"
-import { Timestamp, collection, getDocs, query, where } from "firebase/firestore"
+import { LOCALES } from '@/constants';
+import { Query, collection, getDocs, query, where } from "firebase/firestore"
 
-export interface PageDocumentData {
-    createdAt?: Timestamp;
-    title?: string;
-    content: string;
-    updatedAt?: Timestamp;
-    slug: string;
-    publishedAt?: Timestamp;
-    locale: string;
-    id: string;
-    parent?: PageParamsProps['slug']
-    image?: HTMLImageElement
+const formatDocs = async (query: Query) => {
+    const querySnapshot = await getDocs(query);
+    const results: DocumentData[] = querySnapshot.docs.map(doc => ({
+        ...(doc.data() as DocumentData),
+        id: doc.id
+    }));
+    return results
+
 }
 
-
-export interface DataResponseProps {
-    status: 'success' | 'error'
-    data: PageDocumentData[]
-    error?: any
-}
-
-export const getData = async (collectionName: string, slug?: string, locale?: string): Promise<DataResponseProps> => {
+export const getData = async (collectionName: string, locale?: string | null): Promise<ResponseProps> => {
     try {
         const colRef = collection(db, collectionName);
-        let q;
+        const q = locale ? query(colRef, where("locale", "==", locale)) : colRef;
+        const hasDocs = await getDocs(q);
 
-        if (slug) {
-            q = query(colRef, where("slug", "==", slug));
-        } else if (locale) {
-            q = query(colRef, where("locale", "==", locale));
-        } else {
-            q = query(colRef);
+        if (hasDocs.empty) {
+            throw new Error(`Collection '${collectionName}' does not exist or is empty.`);
         }
-
-        const querySnapshot = await getDocs(q);
-        const results: PageDocumentData[] = querySnapshot.docs.map(doc => ({
-            ...(doc.data() as PageDocumentData),
-            id: doc.id
-        }));
 
         return {
             status: 'success',
-            data: results
+            data: await formatDocs(q)
+        };
+    } catch (e: any) {
+        return {
+            status: 'error',
+            data: [],
+            error: e.message || 'An error occurred while fetching data.'
+        };
+    }
+};
+
+export const getDataBySlug = async (collectionName: string, slug?: string): Promise<ResponseProps> => {
+    try {
+        const colRef = collection(db, collectionName);
+        const q = query(colRef, where("slug", "==", slug));
+        return {
+            status: 'success',
+            data: await formatDocs(q)
         };
     } catch (e) {
         throw (e);
