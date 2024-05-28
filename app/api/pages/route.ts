@@ -38,7 +38,6 @@ export async function POST(request: Request) {
         };
         return new Response(JSON.stringify(result), {
             status: 200,
-            headers: { 'Content-Type': 'application/json' }
         });
     } catch (e: any) {
         const result: IResponse = {

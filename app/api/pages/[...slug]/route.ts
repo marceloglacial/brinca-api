@@ -10,7 +10,7 @@ export async function GET(_request: Request, { params }: { params: { slug: strin
         const result: IPageResponse = {
             status: 'success',
             message: 'Document successfully loaded',
-            total: 0,
+            total: 1,
             data: documents,
         }
         return new Response(JSON.stringify(result), {

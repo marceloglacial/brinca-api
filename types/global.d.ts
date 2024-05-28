@@ -11,7 +11,6 @@ interface IDocumentData {
 
 interface IPageDocumentData extends IDocumentData {
     id: string;
-    pageType: string
     title: LocalizedString;
     slug: LocalizedString;
     content: LocalizedString;
