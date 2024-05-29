@@ -21,7 +21,7 @@ interface IResponse {
     status: 'success' | 'error',
     message: string,
     id?: string | number
-    error?: Error
+    error?: Error | unknown
     data?: any
 }
 
