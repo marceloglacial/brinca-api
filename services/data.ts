@@ -1,10 +1,10 @@
 import db from "@/config/firestore"
-import { Query, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { DocumentData, Query, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore"
 
 export const formatDocs = async (query: Query) => {
     const querySnapshot = await getDocs(query);
-    const results: IDocumentData[] = querySnapshot.docs.map(doc => ({
-        ...(doc.data() as IDocumentData),
+    const results = querySnapshot.docs.map(doc => ({
+        ...(doc.data() as DocumentData),
         id: doc.id
     }));
     return results
