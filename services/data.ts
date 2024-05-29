@@ -78,6 +78,10 @@ export const getDocBySlug = async (collectionName: string, locale: string, slug:
         const q = query(coll, where(`slug.${locale}`, "==", slug));
         const documents = await formatDocs(q)
 
+        if (!documents[0]) throw {
+            message: 'Document not found'
+        }
+
         const result: IResponse = {
             status: 'success',
             message: 'Documents successfully listed',
