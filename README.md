@@ -7,7 +7,7 @@ RESTfull API for [Brinca](https://www.brinca.ca/)
 
 ## Demo
 
-https://brinca-api.vercel.app/
+https://brinca-api.vercel.app
 
 ## Built with
 
