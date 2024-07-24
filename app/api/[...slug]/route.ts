@@ -20,7 +20,13 @@ export async function POST(request: Request, { params }: { params: { slug: strin
     try {
         const collectionName = params.slug[0]
         const data = await request.json();
-        const docRef = await addDoc(collection(db, collectionName), data)
+        const dataToAdd = {
+            ...data,
+            publishedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }
+        const docRef = await addDoc(collection(db, collectionName), dataToAdd)
 
         const result: IResponse = {
             status: 'success',
@@ -87,7 +93,11 @@ export async function PUT(request: Request, { params }: { params: { slug: string
             message: 'Document not found'
         }
         const data = await request.json();
-        await updateDoc(docRef, data)
+        const updatedData = {
+            ...data,
+            updatedAt: new Date().toISOString()
+        }
+        await updateDoc(docRef, updatedData)
         const result: IResponse = {
             status: 'success',
             message: 'Document successfully updated',
