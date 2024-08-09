@@ -6,8 +6,11 @@ export async function GET(_request: Request, { params }: { params: { slug: strin
     const collectionName = params.slug[0]
     const queryType = params.slug[1]
     const documentId = params.slug[2]
+    const url = new URL(_request.url);
+    const limit = url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : 100;
 
-    if (!queryType) return getAllDocs(collectionName)
+
+    if (!queryType) return getAllDocs(collectionName, limit)
     if (queryType === 'id') {
         return await getDocumentById(collectionName, documentId)
 
