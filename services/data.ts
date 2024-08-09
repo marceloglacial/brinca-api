@@ -41,10 +41,10 @@ export const getDocumentById = async (collectionName: string, id: string) => {
     }
 }
 
-export const getAllDocs = async (collectionName: string) => {
+export const getAllDocs = async (collectionName: string, itemsLimit: number) => {
     try {
         const coll = collection(db, collectionName);
-        const q = query(coll, orderBy("publishedAt", "desc"), limit(10));
+        const q = query(coll, orderBy("publishedAt", "desc"), limit(itemsLimit));
 
         const snapshot = await getCountFromServer(q);
         const documents = await formatDocs(q)
