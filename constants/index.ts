@@ -1,5 +1,5 @@
 const LOCALES = {
-    DEFAULT: 'en'
+    DEFAULT: 'pt_br'
 }
 
 const COLLECTIONS = {

@@ -1,5 +1,6 @@
 import db from "@/config/firestore"
 import { DocumentData, Query, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { getCollectionById } from './firebase';
 
 export const formatDocs = async (query: Query) => {
     const querySnapshot = await getDocs(query);
@@ -9,6 +10,42 @@ export const formatDocs = async (query: Query) => {
     }));
     return results
 }
+
+export const getAlldata = async (request: CollectionApiRequest) => {
+    try {
+        const documents = await getCollectionById(request)
+
+        if (!documents.data.length) throw {
+            message: 'Collection not found'
+        }
+
+        const result: ApiResponse<DocumentData[]> = {
+            status: 'success',
+            message: 'Documents successfully listed',
+            total: documents.meta.totalCount,
+            data: documents.data,
+        }
+        return new Response(JSON.stringify(result), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (e: any) {
+        const result: ApiResponse<DocumentData[]> = {
+            status: 'error',
+            message: e.message,
+            error: { ...e }
+        };
+        return new Response(JSON.stringify(result), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
+}
+
+// 
+// OLD
+// 
 
 export const getDocumentById = async (collectionName: string, id: string) => {
     try {
