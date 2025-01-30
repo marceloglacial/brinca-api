@@ -52,21 +52,35 @@ export const getCollectionById = async ({
     try {
         const collectionRef = collection(db, collectionId);
         const orderedQuery = order ? query(collectionRef, orderBy(order)) : collectionRef;
-        const paginatedQuery = query(orderedQuery, limit(pageSize));
+        let paginatedQuery = query(orderedQuery, limit(pageSize));
+
+        if (page > 1) {
+            const previousPageQuery = query(orderedQuery, limit((page - 1) * pageSize));
+            const previousPageSnapshot = await getDocs(previousPageQuery);
+
+            if (!previousPageSnapshot.empty) {
+                const lastVisible = previousPageSnapshot.docs[previousPageSnapshot.docs.length - 1];
+                paginatedQuery = query(orderedQuery, startAfter(lastVisible), limit(pageSize));
+            }
+        }
+
         const querySnapshot = await getDocs(paginatedQuery);
+        const totalCountQuery = await getDocs(collectionRef);
+        const totalCount = totalCountQuery.size;
+        const totalPages = Math.ceil(totalCount / pageSize)
+        const hasNextPage = totalPages > page
 
         return {
             status: 'success',
             message: `Successfully retrieved ${collectionId} collection`,
+            meta: { ...defaultMeta, page, pageSize, totalCount, totalPages, hasNextPage },
             data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-            meta: { ...defaultMeta, page, pageSize }
         };
     } catch (e) {
         return {
             status: 'error',
             message: `Failed to retrieve ${collectionId} collection`,
             data: null,
-            meta: defaultMeta,
         };
     }
 };
@@ -89,7 +103,6 @@ export const getDocumentBySlug = async ({
                 ? `Successfully retrieved document with slug "${slug}"`
                 : `Document with slug "${slug}" not found`,
             data: doc ? { id: doc.id, ...doc.data() } : null,
-            meta: defaultMeta
         };
     } catch (e) {
         return {

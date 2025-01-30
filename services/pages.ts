@@ -18,18 +18,19 @@ const errorResponse = (message: string) => {
 
 const handlePageRequest = async <T>(
   requestFunction: (req: any) => Promise<ApiResponse<T>>,
-  request: PagesApiRequest | SinglePageByIdApiRequest | SinglePageBySlugApiRequest
+  request: ApiRequest | SinglePageByIdApiRequest | SinglePageBySlugApiRequest
 ) => {
   try {
-    const response = await requestFunction(request);
+    const response = await requestFunction({ collectionId: 'pages', ...request });
     return createResponse(response, 200);
   } catch (e: any) {
     return errorResponse(e.message);
   }
 }
 
-export const getPages = (request: PagesApiRequest) =>
-  handlePageRequest<any[]>(getCollectionById, request);
+export const getPages = (request: ApiRequest) => {
+  return handlePageRequest<any[]>(getCollectionById, request);
+};
 
 export const getSinglePageBySlug = (request: SinglePageBySlugApiRequest) =>
   handlePageRequest<any>(getDocumentBySlug, request);
