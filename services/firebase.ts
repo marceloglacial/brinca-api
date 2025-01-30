@@ -69,12 +69,17 @@ export const getCollectionById = async ({
         const totalCount = totalCountQuery.size;
         const totalPages = Math.ceil(totalCount / pageSize)
         const hasNextPage = totalPages > page
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+
+        if (data.length === 0) {
+            throw new Error(`No documents found in ${collectionId} collection`);
+        }
 
         return {
             status: 'success',
             message: `Successfully retrieved ${collectionId} collection`,
             meta: { ...defaultMeta, page, pageSize, totalCount, totalPages, hasNextPage },
-            data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+            data,
         };
     } catch (e) {
         return {

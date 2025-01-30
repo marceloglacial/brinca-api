@@ -23,11 +23,17 @@ interface ApiRequest {
     pageSize?: number;
 }
 
-interface SinglePageBySlugApiRequest {
+interface DataApiRequest extends ApiRequest {
+    collectionId: string;
+}
+
+interface DataBySlugApiRequest {
+    collectionId: string;
     slug: string;
     locale: string;
 }
 
-interface SinglePageByIdApiRequest {
+interface DataByIdApiRequest {
+    collectionId: string;
     documentId: string;
 }
